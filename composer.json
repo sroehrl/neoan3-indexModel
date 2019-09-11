@@ -1,0 +1,16 @@
+{
+    "name": "neoan3-model/index",
+    "description": "Index model for neoan3 (required for neoan3 installations ^0.0.2)",
+    "minimum-stability": "dev",
+    "require": {
+        "mnsami/composer-custom-directory-installer": "1.1.*"
+    },
+    "license": "MIT",
+    "extra": {
+        "installer-paths": {
+            "./frame/{$name}": [],
+            "./model/{$name}": [],
+            "./component/{$name}": []
+        }
+    }
+}
