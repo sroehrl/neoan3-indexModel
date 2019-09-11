@@ -1,6 +1,6 @@
 {
     "name": "neoan3-model/index",
-    "description": "Core model (required for neoan3 ^0.0.2)",
+    "description": "",
     "minimum-stability": "dev",
     "require": {
         "mnsami/composer-custom-directory-installer": "1.1.*"
