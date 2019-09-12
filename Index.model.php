@@ -95,9 +95,12 @@ class IndexModel
         return $obj;
     }
 
-    static function getMigrateStructure($model)
+    static function getMigrateStructure($model, $migratePath = false)
     {
         $path = dirname(__DIR__) . DIRECTORY_SEPARATOR . $model . DIRECTORY_SEPARATOR . 'migrate.json';
+        if($migratePath){
+            $path = $migratePath;
+        }
         $structure = [];
         if (file_exists($path)) {
             $pattern = json_decode(file_get_contents($path), true);
