@@ -69,11 +69,11 @@ class IndexModel
                     foreach ($info['on_creation'] as $field => $transform) {
                         if ($info['depth'] == 'one') {
                             $value = isset($obj[$tableOrField][$field]) ? $obj[$tableOrField][$field] : false;
-                            $obj[$tableOrField][$field] = $transform($value);
+                            $obj[$tableOrField][$field] = $transform($value, $obj);
                         } else {
                             foreach ($obj[$tableOrField] as $i => $oneInMany) {
                                 $value = isset($oneInMany[$field]) ? $oneInMany[$field] : false;
-                                $obj[$tableOrField][$i][$field] = $transform($value);
+                                $obj[$tableOrField][$i][$field] = $transform($value, $obj);
                             }
                         }
                     }
@@ -82,7 +82,7 @@ class IndexModel
                 // value
                 if (isset($info['on_creation'])) {
                     $obj[$tableOrField] =
-                        $info['on_creation'](isset($obj[$tableOrField]) ? $obj[$tableOrField] : false);
+                        $info['on_creation'](isset($obj[$tableOrField]) ? $obj[$tableOrField] : false, $obj);
                 }
             }
             // translate?
