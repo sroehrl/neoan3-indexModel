@@ -2,9 +2,16 @@
 
 namespace Neoan3\Model;
 
+use Exception;
+
 class IndexModel
 {
 
+    /**
+     * @param $ask
+     *
+     * @return array|mixed
+     */
     static function first($ask)
     {
         if (!empty($ask)) {
@@ -14,6 +21,12 @@ class IndexModel
         }
     }
 
+    /**
+     * @param $modelName
+     * @param $deepModel
+     *
+     * @return array
+     */
     static function flatten($modelName, $deepModel)
     {
         $separate = [];
@@ -33,14 +46,14 @@ class IndexModel
      * @param $transformer
      *
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     static function validateAgainstTransformer($obj, $transformer)
     {
         foreach ($transformer as $tableOrField => $info) {
             // if missing
             if (isset($info['required']) && $info['required'] && !isset($obj[$tableOrField])) {
-                throw new \Exception('Missing: ' . $tableOrField);
+                throw new Exception('Missing: ' . $tableOrField);
             }
             // is table or field?
             if (isset($info['depth'])) {
@@ -49,16 +62,16 @@ class IndexModel
                     foreach ($info['required_fields'] as $field) {
                         if ($info['depth'] == 'one') {
                             if (!isset($obj[$tableOrField][$field])) {
-                                throw new \Exception('Missing or malformed: ' . $field);
+                                throw new Exception('Missing or malformed: ' . $field);
                             }
                         } else {
                             if ($info['depth'] == 'many') {
                                 if (empty($obj[$tableOrField])) {
-                                    throw new \Exception('Missing or malformed: ' . $field);
+                                    throw new Exception('Missing or malformed: ' . $field);
                                 }
                                 foreach ($obj[$tableOrField] as $oneInMany) {
                                     if (!isset($oneInMany[$field])) {
-                                        throw new \Exception('Missing or malformed: ' . $field);
+                                        throw new Exception('Missing or malformed: ' . $field);
                                     }
                                 }
                             }
@@ -78,11 +91,28 @@ class IndexModel
                         }
                     }
                 }
+                if (isset($info['on_update'])) {
+                    foreach ($info['on_update'] as $field => $transform) {
+                        if ($info['depth'] == 'one') {
+                            $value = isset($obj[$tableOrField][$field]) ? $obj[$tableOrField][$field] : false;
+                            $obj[$tableOrField][$field] = $transform($value, $obj);
+                        } else {
+                            foreach ($obj[$tableOrField] as $i => $oneInMany) {
+                                $value = isset($oneInMany[$field]) ? $oneInMany[$field] : false;
+                                $obj[$tableOrField][$i][$field] = $transform($value, $obj);
+                            }
+                        }
+                    }
+                }
             } else {
                 // value
                 if (isset($info['on_creation'])) {
                     $obj[$tableOrField] =
                         $info['on_creation'](isset($obj[$tableOrField]) ? $obj[$tableOrField] : false, $obj);
+                }
+                if (isset($info['on_update'])) {
+                    $obj[$tableOrField] =
+                        $info['on_update'](isset($obj[$tableOrField]) ? $obj[$tableOrField] : false, $obj);
                 }
             }
             // translate?
@@ -95,6 +125,13 @@ class IndexModel
         return $obj;
     }
 
+    /**
+     * @param      $model
+     * @param bool $migratePath
+     *
+     * @return array
+     * @throws Exception
+     */
     static function getMigrateStructure($model, $migratePath = false)
     {
         $path = dirname(__DIR__) . DIRECTORY_SEPARATOR . $model . DIRECTORY_SEPARATOR . 'migrate.json';
@@ -115,7 +152,7 @@ class IndexModel
             }
             return $structure;
         } else {
-            throw new \Exception('no migrate json found');
+            throw new Exception('no migrate json found');
         }
     }
 }
