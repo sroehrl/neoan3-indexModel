@@ -4,7 +4,7 @@
     "minimum-stability": "dev",
     "require": {
         "mnsami/composer-custom-directory-installer": "1.1.*",
-      "ext-json": "*"
+        "ext-json": "*"
     },
     "license": "MIT",
     "extra": {
